@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Gridjs Server Side Data</title>
+  <script src="https://unpkg.com/gridjs/dist/gridjs.production.min.js"></script>
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+</head>
+
+<body>
+
+  <label for="estados">Selecione um estado:</label>
+  <select id="estados" name="estados" onchange="exibeCidades();">
+    <option value="AC">Acre</option>
+    <option value="AL">Alagoas</option>
+    <option value="AP">Amapá</option>
+    <option value="AM">Amazonas</option>
+    <option value="BA">Bahia</option>
+    <option value="CE">Ceará</option>
+    <option value="DF">Distrito Federal</option>
+    <option value="ES">Espírito Santo</option>
+    <option value="GO">Goiás</option>
+    <option value="MA">Maranhão</option>
+    <option value="MT">Mato Grosso</option>
+    <option value="MS">Mato Grosso do Sul</option>
+    <option value="MG">Minas Gerais</option>
+    <option value="PA">Pará</option>
+    <option value="PB">Paraíba</option>
+    <option value="PR">Paraná</option>
+    <option value="PE">Pernambuco</option>
+    <option value="PI">Piauí</option>
+    <option value="RJ">Rio de Janeiro</option>
+    <option value="RN">Rio Grande do Norte</option>
+    <option value="RS">Rio Grande do Sul</option>
+    <option value="RO">Rondônia</option>
+    <option value="RR">Roraima</option>
+    <option value="SC">Santa Catarina</option>
+    <option value="SP">São Paulo</option>
+    <option value="SE">Sergipe</option>
+    <option value="TO">Tocantins</option>
+</select>
+
+ <label for="estados">Selecione um municipio:</label>
+<select id="municipios" name="municipios">
+</select>
+
+  <br>
+  <br>
+  <div id="table-gridjs"></div>
+
+  <!--PREENCHE MUNICIPIOS-->
+  <script>
+
+    function preencheMunicipios()
+    {
+      var select = document.getElementById("municipios");
+
+      select.innerHTML = '';
+
+      var selectEstado = document.getElementById("estados");
+      var estadoSelecionado = selectEstado.value;
+
+     const options =
+     {
+        method: 'GET',
+        headers: { 'content-type': 'application/json' }
+     }
+
+        fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + estadoSelecionado + '/municipios', options)
+        .then(response => response.json())
+        .then(data => {
+            // Faça o que quiser com os dados dentro deste bloco
+            data.forEach(item => {
+              var option = document.createElement("option");
+              option.value = item.nome
+              option.text = item.nome
+              select.add(option);
+            // Faça algo com cada item individual do array
+           // console.log(item.nome);
+           // console.log(item.microrregiao.mesorregiao.UF.nome);
+            });
+            console.log("TOTALLL: ",data.length)
+            
+        })
+        .catch(error => {
+            // Trate os erros aqui
+            console.error('Erro na requisição:', error);
+        });
+
+    }
+     
+
+  </script>
+
+<!--FUNCIONANDO MOSTRANDO TODAS CIDADES DE MINAS E SEU ESTADO-->
+<!-- <script>
+    new gridjs.Grid({
+      columns: ["cidade","estado"],
+      server:
+      { 
+          url : 'https://servicodados.ibge.gov.br/api/v1/localidades/estados/MG/municipios',
+          then : data => data.map(item =>[item.nome,item.microrregiao.mesorregiao.UF.nome])
+      },
+    }).render(document.getElementById("table-gridjs"));
+  </script>
+  --> 
+
+  <!--FUNCIONANDO - ATUALIZA A TABELA AO SELECIONAR OUTRO ESTADO-->
+<script>
+    function exibeCidades() {
+        var select = document.getElementById("estados");
+        var estadoSelecionado = select.value;
+
+        var container = document.getElementById("table-gridjs");
+        
+        // Remove any existing content inside the container
+        container.innerHTML = '';
+
+        // Create a new div element to act as a container for the Grid.js instance
+        var table = document.createElement("div");
+        container.appendChild(table);
+
+        // Create Grid.js instance
+        const mygrid = new gridjs.Grid({
+            columns: ["cidade", "estado"],
+            server: {
+                url: 'https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + estadoSelecionado + '/municipios',
+                then: data => data.map(item => [item.nome, item.microrregiao.mesorregiao.UF.nome]),
+            },
+        });
+
+        // Render the Grid.js instance to the dynamically created div
+        mygrid.render(table);
+
+        // Destroy the Grid.js instance (if it exists)
+        if (table.grid) {
+            table.grid.destroy();
+        }
+
+        preencheMunicipios()
+    }
+</script>
+
+</body>
+</html>
