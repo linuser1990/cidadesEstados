@@ -14,6 +14,10 @@ app.get('/cliente',async (req, res) =>
     res.json({ results: rows });
 })
 
+app.get('/cidadesEstadosMapa', (req, res) =>
+{
+    res.render('tabelaCidadesEstadosMaps')
+})
 
 app.get('/cidadesEstados', (req, res) =>
 {

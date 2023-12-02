@@ -10,7 +10,7 @@
 <body>
 
   <label for="estados">Selecione um estado:</label>
-  <select id="estados" name="estados" onchange="exibeCidades();">
+  <select id="estados" name="estados" onchange="preencheMunicipios();">
     <option value="AC">Acre</option>
     <option value="AL">Alagoas</option>
     <option value="AP">Amapá</option>
@@ -46,16 +46,43 @@
 
   <br>
   <br>
-  <div id="table-gridjs"></div>
+
+  <table id="table1">
+    <thead>
+        <tr>
+            <td>
+                Cidade
+            </td>
+            <td>
+                Estado
+            </td>
+            <td>
+                Vizualizar no Mapa
+            </td>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    </tbody>
+  </table>
 
   <!--PREENCHE MUNICIPIOS-->
   <script>
 
     function preencheMunicipios()
     {
+      var table = document.getElementById('table1')
+      // Clear existing rows
+      table.querySelector('tbody').innerHTML = '';
+
       var select = document.getElementById("municipios");
 
       select.innerHTML = '';
+      table.innerHTML = ''
+
+      // Add thead section
+      addTableHeader(table);
 
       var selectEstado = document.getElementById("estados");
       var estadoSelecionado = selectEstado.value;
@@ -69,15 +96,31 @@
         fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + estadoSelecionado + '/municipios', options)
         .then(response => response.json())
         .then(data => {
+
+            // Create tbody if not already present
+            var tbody = table.querySelector('tbody');
+            if (!tbody) {
+                tbody = table.createTBody();
+            }
+
+
             // Faça o que quiser com os dados dentro deste bloco
             data.forEach(item => {
               var option = document.createElement("option");
               option.value = item.nome
               option.text = item.nome
               select.add(option);
-            // Faça algo com cada item individual do array
-           // console.log(item.nome);
-           // console.log(item.microrregiao.mesorregiao.UF.nome);
+
+            // Append a new row to the table
+            var newRow = tbody.insertRow();
+            var cell1 = newRow.insertCell(0);
+            var cell2 = newRow.insertCell(1);
+            var cell3 = newRow.insertCell(2);
+
+            cell1.textContent = item.nome;  // Cidade
+            cell2.textContent = estadoSelecionado;  // Estado (you might want to change this)
+            cell3.innerHTML = '<button onclick="visualizarMapa(\'' + item.nome + '\')">Visualizar no Mapa</button>';
+
             });
             console.log("TOTALLL: ",data.length)
             
@@ -106,40 +149,29 @@
   --> 
 
   <!--FUNCIONANDO - ATUALIZA A TABELA AO SELECIONAR OUTRO ESTADO-->
-<script>
-    function exibeCidades() {
-        var select = document.getElementById("estados");
-        var estadoSelecionado = select.value;
 
-        var container = document.getElementById("table-gridjs");
-        
-        // Remove any existing content inside the container
-        container.innerHTML = '';
-
-        // Create a new div element to act as a container for the Grid.js instance
-        var table = document.createElement("div");
-        container.appendChild(table);
-
-        // Create Grid.js instance
-        const mygrid = new gridjs.Grid({
-            columns: ["Cidade", "Estado"],
-            server: {
-                url: 'https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + estadoSelecionado + '/municipios',
-                then: data => data.map(item => [item.nome, item.microrregiao.mesorregiao.UF.nome]),
-            },
-        });
-
-        // Render the Grid.js instance to the dynamically created div
-        mygrid.render(table);
-
-        // Destroy the Grid.js instance (if it exists)
-        if (table.grid) {
-            table.grid.destroy();
-        }
-
-        preencheMunicipios()
+  <script>
+    function addTableHeader(table) {
+      var thead = table.createTHead();
+      var row = thead.insertRow();
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+      cell1.textContent = 'Cidade';
+      cell2.textContent = 'Estado';
+      cell3.textContent = 'Visualizar no Mapa';
     }
-</script>
+    </script>
+
+    <script>
+       function visualizarMapa(nome)
+       {
+        var link = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(nome);
+
+        // Abre o link em uma nova aba
+        window.open(link, '_blank');
+       }
+    </script>
 
 </body>
 </html>
