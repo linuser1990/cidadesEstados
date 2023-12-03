@@ -10,8 +10,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.get('/cliente',async (req, res) =>
 {
     const {rows} = await pool.query('SELECT * FROM cliente')
-    console.log(rows)
-    res.json({ results: rows });
+    const projeto = [{p1 :'p11',p2 : 'p22'},{p3 : 'p33'}]
+    res.json({linhas : rows,pro : projeto});
 })
 
 app.get('/cidadesEstadosMapa', (req, res) =>

@@ -20,16 +20,29 @@
       columns: ["Código","Nome"],
       server:
       {
-          /*url: "https://swapi.dev/api/films/",
-          then: data => data.results.map(movie =>
-            [movie.title, movie.release_date, movie.director, movie.producer]
-            
-          )*/
 
           url : 'http://localhost:4000/cliente',
-          then : data => data.results.map(cliente =>[cliente.codigo,cliente.nome])
+          then : data => data.linhas.map(cliente =>[cliente.codigo,cliente.nome])
       },
     }).render(document.getElementById("table-gridjs"));
+  </script>
+
+
+  <script>
+    const options =
+    {
+      method : 'GET',
+      headers : {'content-type' : 'application/json'}
+    }
+
+    fetch('/cliente',options)
+    .then(response => response.json())
+    .then(data => data.pro.forEach(element => {
+      console.log(element )
+    })
+    )
+    //}))
+
   </script>
 
 </body>
